@@ -1118,8 +1118,8 @@ h2 {
     padding: 42px 34px;
     text-align: center;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.005));
-    backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
 }
 
 .category-card__content h3 {
@@ -1421,6 +1421,7 @@ h2 {
         max-height: 42px;
     }
 }
+
 
 .site-footer {
     position: relative;
