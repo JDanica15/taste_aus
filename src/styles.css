@@ -1006,7 +1006,7 @@ h2 {
 
 .categories-section {
     background: #050505;
-    padding: 118px 0 84px;
+    padding: 118px 0 200px;
     color: #f7f6f5;
 }
 
@@ -1138,9 +1138,16 @@ h2 {
 }
 
 @media (max-width: 680px) {
+    .intro-section {
+        padding: 100px 32px;
+    }
+    .intro-grid {
+        min-height: 60vh
+    
+    }
     .categories-section {
         padding-top: 84px;
-        padding-bottom: 70px;
+        padding-bottom: 90px;
     }
 
     .section-heading {
@@ -1178,7 +1185,7 @@ h2 {
 
 .partners-section {
     background: #ece9e3;
-    padding: 30px 0 26px;
+    padding: 40px 0 40px;
     overflow: hidden;
 }
 
