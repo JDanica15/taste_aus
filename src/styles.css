@@ -1068,8 +1068,16 @@ h2 {
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    box-shadow:
+        0 16px 40px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03);
     border: 0;
+    background-color: rgba(255, 255, 255, 0.01);
+    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+    transition:
+        box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .category-card.featured {
@@ -1081,8 +1089,22 @@ h2 {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 50% 56%, rgba(255, 255, 255, 0.06), transparent 24%),
-        linear-gradient(180deg, rgba(8, 8, 8, 0.28), rgba(8, 8, 8, 0.7) 56%, rgba(0, 0, 0, 0.62));
+        radial-gradient(circle at 50% 56%, rgba(255, 255, 255, 0.08), transparent 24%),
+        linear-gradient(180deg, rgba(8, 8, 8, 0.08), rgba(8, 8, 8, 0.66) 56%, rgba(0, 0, 0, 0.58));
+    transition: opacity 220ms ease;
+}
+
+.category-card:hover,
+.category-card:focus-within {
+    box-shadow:
+        0 22px 50px rgba(0, 0, 0, 0.26),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.category-card:hover::after,
+.category-card:focus-within::after {
+    opacity: 0.92;
 }
 
 .category-card__content {
@@ -1095,6 +1117,27 @@ h2 {
     justify-content: center;
     padding: 42px 34px;
     text-align: center;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.005));
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.category-card__content h3 {
+    font-weight: 500;
+}
+
+.category-card__content::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 42%);
+    pointer-events: none;
+}
+
+.category-card:hover .category-card__content,
+.category-card:focus-within .category-card__content {
+    transform: none;
 }
 
 .category-card h3 {
@@ -1107,12 +1150,29 @@ h2 {
 }
 
 .category-card p {
-    margin: 18px auto 0;
+    margin: 0 auto;
     max-width: 250px;
     color: rgba(255, 255, 255, 0.84);
     line-height: 1.1;
     font-size: 0.82rem;
     text-wrap: balance;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+        max-height 260ms cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 200ms ease,
+        transform 200ms ease,
+        margin-top 200ms ease;
+}
+
+.category-card:hover p,
+.category-card:focus-within p {
+    margin-top: 18px;
+    max-height: 140px;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 @media (max-width: 1400px) {

@@ -135,27 +135,32 @@ function App() {
       },
       {
         title: 'Produce',
-        description: '',
+        description:
+          'Producer-led storytelling that highlights provenance, seasonality, and the people behind the ingredients.',
         image: '/assets/produce.jpeg',
       },
       {
         title: 'Hospitality',
-        description: '',
+        description:
+          'Immersive venue content that captures atmosphere, service, and the full guest experience.',
         image: '/assets/hospitality.jpeg',
       },
       {
         title: 'Influence',
-        description: '',
+        description:
+          'Campaigns built for creator-led reach, trusted voices, and social-first momentum.',
         image: '/assets/influence.jpeg',
       },
       {
         title: 'Experience',
-        description: '',
+        description:
+          'Experience design and brand moments that turn visits, launches, and events into stories.',
         image: '/assets/experience.jpeg',
       },
       {
         title: 'Drinks & Wine',
-        description: '',
+        description:
+          'Elegant visual storytelling for wineries, bars, and drinks brands with a premium edge.',
         image: '/assets/made-4.png',
       },
     ],
@@ -556,7 +561,7 @@ function App() {
               >
                 <div className="category-card__content">
                   <h3>{category.title}</h3>
-                  {category.featured ? <p>{category.description}</p> : null}
+                  <p>{category.description}</p>
                 </div>
               </article>
             ))}
