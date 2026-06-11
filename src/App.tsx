@@ -19,7 +19,7 @@ import taylorCard3 from '/assets/crown.jpeg';
 import taylorCard4 from '/assets/butter.jpeg';
 
 type DrawerId = 'about' | 'services' | 'portfolio' | 'taylor';
-type MobileSectionId = 'home' | DrawerId;
+type MobileSectionId = DrawerId;
 
 type DrawerCard = {
   title: string;
@@ -35,7 +35,6 @@ const drawerTabs: { id: DrawerId; label: string }[] = [
 ];
 
 const mobileSections: { id: MobileSectionId; label: string }[] = [
-  { id: 'home', label: 'Home' },
   { id: 'about', label: 'About' },
   { id: 'services', label: 'Services' },
   { id: 'portfolio', label: 'Portfolio' },
@@ -88,6 +87,12 @@ const drawerContent: Record<DrawerId, { title: string; description: string; card
 
 function App() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const introRef = useRef<HTMLElement>(null);
+  const servicesRef = useRef<HTMLElement>(null);
+  const categoriesRef = useRef<HTMLElement>(null);
+  const partnersRef = useRef<HTMLElement>(null);
+  const footerRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const mobileMenuRef = useRef<HTMLElement>(null);
   const burgerButtonRef = useRef<HTMLButtonElement>(null);
@@ -95,7 +100,9 @@ function App() {
   const [activeDrawer, setActiveDrawer] = useState<DrawerId | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [expandedMobileSection, setExpandedMobileSection] = useState<MobileSectionId>('about');
+  const [expandedMobileSection, setExpandedMobileSection] = useState<MobileSectionId | null>(null);
+  const [scrolledPastHero, setScrolledPastHero] = useState(false);
+  const [headerTone, setHeaderTone] = useState<'light' | 'dark'>('light');
 
   const partners = useMemo(
     () => [
@@ -142,29 +149,81 @@ function App() {
         image: '/assets/influence.jpeg',
       },
       {
-        title: 'Influence',
+        title: 'Experience',
         description: '',
-        image: '/assets/influence.jpeg',
+        image: '/assets/experience.jpeg',
       },
       {
-        title: 'Influence',
+        title: 'Drinks & Wine',
         description: '',
-        image: '/assets/influence.jpeg',
+        image: '/assets/made-4.png',
       },
     ],
     [],
   );
 
   useEffect(() => {
+    const updateHeaderTone = () => {
+      const probeY = Math.max(120, window.innerHeight * 0.18);
+
+      const sections = [heroRef, introRef, servicesRef, categoriesRef, partnersRef, footerRef];
+
+      const activeSection = sections.find((ref) => {
+        const element = ref.current;
+        if (!element) {
+          return false;
+        }
+
+        const rect = element.getBoundingClientRect();
+        return rect.top <= probeY && rect.bottom > probeY;
+      });
+
+      if (activeSection) {
+        const tone = activeSection.current?.dataset.headerTone === 'dark' ? 'dark' : 'light';
+        setHeaderTone((current) => (current === tone ? current : tone));
+        return;
+      }
+
+      const fallbackTone = window.scrollY < (introRef.current?.offsetTop ?? 0) ? 'light' : 'dark';
+      setHeaderTone((current) => (current === fallbackTone ? current : fallbackTone));
+    };
+
     const handleScroll = () => {
       const offset = window.pageYOffset;
       if (videoRef.current) {
         videoRef.current.style.transform = `translateY(${offset * 0.03}px) scale(1.08)`;
       }
+
+      updateHeaderTone();
     };
 
+    updateHeaderTone();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', updateHeaderTone);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', updateHeaderTone);
+    };
+  }, []);
+
+  useEffect(() => {
+    const heroSection = heroRef.current;
+    if (!heroSection) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setScrolledPastHero(!entry.isIntersecting);
+      },
+      {
+        rootMargin: '-80px 0px 0px 0px',
+        threshold: 0,
+      },
+    );
+
+    observer.observe(heroSection);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -172,6 +231,7 @@ function App() {
       if (event.key === 'Escape') {
         setDrawerOpen(false);
         setMobileMenuOpen(false);
+        setExpandedMobileSection(null);
       }
     };
 
@@ -196,6 +256,7 @@ function App() {
 
       if (mobileMenuOpen && !clickedMobileMenu && !clickedBurger) {
         setMobileMenuOpen(false);
+        setExpandedMobileSection(null);
         return;
       }
 
@@ -212,6 +273,7 @@ function App() {
     const handleResize = () => {
       if (window.innerWidth > 768) {
         setMobileMenuOpen(false);
+        setExpandedMobileSection(null);
       } else {
         setDrawerOpen(false);
       }
@@ -220,6 +282,12 @@ function App() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) {
+      setExpandedMobileSection(null);
+    }
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     const slider = categoryCarouselRef.current;
@@ -282,7 +350,7 @@ function App() {
 
   return (
     <div className="app-shell" id="top">
-      <header className="site-header" ref={headerRef}>
+      <header className={`site-header${scrolledPastHero ? ' is-scrolled' : ''}${headerTone === 'dark' ? ' is-dark' : ''}`} ref={headerRef}>
         <div className="brand">TASTE OF AUS & NZ</div>
         <nav className={`nav-panel${drawerOpen ? ' is-open' : ''}`}>
           <div className="nav-panel__tabs">
@@ -377,43 +445,21 @@ function App() {
           <div className="mobile-menu__sections">
             {mobileSections.map((section) => {
               const isOpen = expandedMobileSection === section.id;
-              const sectionContent = section.id === 'home' ? null : drawerContent[section.id];
+              const sectionContent = drawerContent[section.id];
 
               return (
                 <div key={section.id} className={`mobile-menu__section${isOpen ? ' is-open' : ''}`}>
                   <button
                     type="button"
                     className="mobile-menu__trigger"
-                    onClick={() => {
-                      if (section.id === 'home') {
-                        setExpandedMobileSection((current) => (current === 'home' ? 'about' : 'home'));
-                        return;
-                      }
-
-                      setExpandedMobileSection((current) => (current === section.id ? 'home' : section.id));
-                    }}
+                    onClick={() => setExpandedMobileSection((current) => (current === section.id ? null : section.id))}
                   >
                     <span>{section.label}</span>
                     <span className="mobile-menu__indicator">{isOpen ? '−' : '+'}</span>
                   </button>
 
                   <div className="mobile-menu__dropdown">
-                    {section.id === 'home' ? (
-                      <div className="mobile-menu__links">
-                        <a href="#top" onClick={() => setMobileMenuOpen(false)}>
-                          Back to top
-                        </a>
-                        <a href="#about" onClick={() => setMobileMenuOpen(false)}>
-                          About
-                        </a>
-                        <a href="#services" onClick={() => setMobileMenuOpen(false)}>
-                          Services
-                        </a>
-                        <a href="#portfolio" onClick={() => setMobileMenuOpen(false)}>
-                          Portfolio
-                        </a>
-                      </div>
-                    ) : sectionContent ? (
+                    {sectionContent ? (
                       <div className="mobile-menu__cards">
                         {sectionContent.cards.slice(0, 4).map((card, index) => (
                           <article
@@ -437,7 +483,7 @@ function App() {
         </div>
       </aside>
 
-      <section className="hero-section">
+      <section className="hero-section" ref={heroRef} data-header-tone="light">
         <video
           ref={videoRef}
           className="hero-video"
@@ -455,7 +501,7 @@ function App() {
         </div>
       </section>
 
-      <section id="about" className="intro-section">
+      <section id="about" className="intro-section" ref={introRef} data-header-tone="dark">
         <div className="intro-grid">
           <div className="intro-title">
             <h2>Brought to life through immersive storytelling</h2>
@@ -470,7 +516,7 @@ function App() {
         </div>
       </section>
 
-      <section className="services-section" id="services">
+      <section className="services-section" id="services" ref={servicesRef} data-header-tone="light">
         <img className="services-bg" src="/assets/butter.jpeg" alt="" aria-hidden="true" />
         <div className="services-overlay" />
         <div className="services-content" aria-label="Branding and marketing services">
@@ -496,7 +542,7 @@ function App() {
         </div>
       </section>
 
-      <section id="portfolio" className="categories-section">
+      <section id="portfolio" className="categories-section" ref={categoriesRef} data-header-tone="light">
         <div className="section-heading">
           <span className="section-title">Categories we support</span>
         </div>
@@ -518,7 +564,7 @@ function App() {
         </div>
       </section>
 
-      <section className="partners-section">
+      <section className="partners-section" ref={partnersRef} data-header-tone="dark">
         <div className="partner-carousel" aria-label="Client logos">
           <div className="partner-track">
             {partners.concat(partners).map((partner, index) => (
@@ -530,7 +576,7 @@ function App() {
         </div>
       </section>
 
-      <footer className="site-footer" id="contact">
+      <footer className="site-footer" id="contact" ref={footerRef} data-header-tone="dark">
         <div className="footer-grid">
           <div className="footer-brand-column">
             <div className="footer-brand footer-brand--large">
