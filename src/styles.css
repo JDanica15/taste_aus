@@ -1562,6 +1562,7 @@ h2 {
         flex-wrap: nowrap;
         top: 7px;
         color: #fff !important;
+        top: 0;
     }
 
     .burger-button {
