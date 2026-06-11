@@ -589,8 +589,8 @@ function App() {
               <span>AUS &amp; NZ</span>
             </div>
             <p className="footer-ack">
-              &lsquo;Taste&rsquo; acknowledges the Gadigal people of the Eora Nation, the land on which we work, and
-              we pay our respects to Elders past, present and emerging.
+              <span style={{ fontWeight: 'bold' }}>&lsquo;Taste&rsquo;</span> acknowledges the Gadigal people of the Eora Nation, the land on which we work, and
+              we pay our respects to <span className="italic">Elders past</span>, <span className="italic">present</span> and <span className="italic">emerging</span>.
             </p>
             <div className="footer-socials" aria-label="Social links">
               <a href="#contact" className="social-icon" aria-label="YouTube">
